@@ -1,6 +1,6 @@
 /*
  * app.js - Vue 3 + p5.js + Tailwind
- * Atualização: Cores vibrantes, Animação lenta e Explosão de diversidade (flores secundárias)
+ * Atualização: Insetos Nítidos (Silhuetas Pretas) inspirados nas referências
  */
 
 const { createApp, ref, onMounted, onBeforeUnmount } = Vue;
@@ -49,8 +49,7 @@ createApp({
             let angle = 10;
             let gardenCanvas;
 
-            // --- CONFIGURAÇÃO GENÉTICA (VELOCIDADES LENTAS) ---
-            // Adicionei growMin/growMax para controlar a velocidade de desabrochar por espécie
+            // --- CONFIGURAÇÃO GENÉTICA ---
             const flowerTypes = [
                 { name: 'Tulipa', pcMin: 5, pcMax: 6, stretchMin: 1.5, stretchMax: 2.0, growMin: 0.03, growMax: 0.06 },
                 { name: 'Rosa', pcMin: 10, pcMax: 15, stretchMin: 0.8, stretchMax: 1.2, growMin: 0.02, growMax: 0.05 },
@@ -64,21 +63,75 @@ createApp({
                 { name: 'Petunia', pcMin: 5, pcMax: 5, stretchMin: 0.6, stretchMax: 0.9, growMin: 0.03, growMax: 0.06 }
             ];
 
-            // --- CORES VIBRANTES E PROFISSIONAIS ---
-            // Intervalos RGB mais estreitos e saturados
             const colorPalettes = {
-                'rosa': { r: [220, 255], g: [20, 100], b: [100, 180] }, // Rosa choque/magenta
-                'amarelo': { r: [230, 255], g: [200, 240], b: [0, 50] },    // Amarelo ouro
-                'vermelho': { r: [200, 255], g: [0, 30], b: [0, 30] },    // Vermelho sangue
-                'jade': { r: [0, 50], g: [180, 220], b: [130, 180] }, // Verdeazulado profundo
-                'roxo': { r: [100, 160], g: [0, 50], b: [180, 240] }, // Roxo real
-                'azul': { r: [0, 60], g: [80, 150], b: [200, 255] }, // Azul oceano
+                'rosa': { r: [220, 255], g: [20, 100], b: [100, 180] },
+                'amarelo': { r: [230, 255], g: [200, 240], b: [0, 50] },
+                'vermelho': { r: [200, 255], g: [0, 30], b: [0, 30] },
+                'jade': { r: [0, 50], g: [180, 220], b: [130, 180] },
+                'roxo': { r: [100, 160], g: [0, 50], b: [180, 240] },
+                'azul': { r: [0, 60], g: [80, 150], b: [200, 255] },
                 'branco': { r: [245, 255], g: [245, 255], b: [245, 255], isWhite: true }
             };
 
             const options = {
                 bloomRadius: { min: 8, max: 12 }
             };
+
+            // --- DESENHO VETORIAL DE INSETOS (Silhuetas Nítidas) ---
+
+            function drawBee(x, y, alpha, angle) {
+                p.push();
+                p.translate(x, y);
+                p.rotate(angle); // Rotação aleatória
+                p.scale(0.8); // Ajuste de tamanho global
+
+                p.noStroke();
+                p.fill(20, alpha); // Preto quase sólido (levemente suave para não serrilhar)
+
+                // Corpo (Oval robusto)
+                p.ellipse(0, 0, 10, 7);
+
+                // Cabeça (Círculo na ponta)
+                p.circle(6, 0, 4);
+
+                // Asas (Forma de gota apontando para trás/cima)
+                p.push();
+                p.rotate(p.QUARTER_PI); // Inclina as asas
+                p.ellipse(-2, -6, 6, 10); // Asa 1
+                p.ellipse(2, -6, 6, 10);  // Asa 2
+                p.pop();
+
+                p.pop();
+            }
+
+            function drawButterfly(x, y, alpha, angle) {
+                p.push();
+                p.translate(x, y);
+                p.rotate(angle);
+                p.scale(0.7); // Borboletas delicadas
+
+                p.noStroke();
+                p.fill(20, alpha); // Preto sólido
+
+                // Corpo Central
+                p.ellipse(0, 0, 3, 12);
+
+                // Asas Superiores (Grandes e arredondadas)
+                p.push();
+                p.rotate(p.radians(-20));
+                p.ellipse(-6, -6, 10, 10); // Esq Sup
+                p.ellipse(6, -6, 10, 10);  // Dir Sup
+                p.pop();
+
+                // Asas Inferiores (Menores)
+                p.push();
+                p.rotate(p.radians(10));
+                p.ellipse(-5, 4, 7, 9);  // Esq Inf
+                p.ellipse(5, 4, 7, 9);   // Dir Inf
+                p.pop();
+
+                p.pop();
+            }
 
             class Petal {
                 constructor(stretchA, stretchB, startAngle, angle, growFactor, bloom) {
@@ -103,10 +156,8 @@ createApp({
                     let c = this.bloom.c;
 
                     if (this.bloom.isWhite) {
-                        // Branco Profissional: Borda cinza chumbo elegante, não preto chapado
                         p.stroke(60, 60, 70, currentAlpha);
                         p.strokeWeight(0.8);
-                        // Preenchimento branco sutil para destacar do fundo
                         p.fill(255, 255, 255, currentAlpha * 0.8);
                     } else {
                         c.setAlpha(currentAlpha);
@@ -131,16 +182,23 @@ createApp({
             }
 
             class Bloom {
-                constructor(pos, r, c, pc, stretchMin, stretchMax, growMin, growMax, isWhite) {
+                constructor(pos, r, c, pc, stretchMin, stretchMax, growMin, growMax, isWhite, stretchModifier, insectType) {
                     this.pos = pos;
                     this.r = r;
                     this.c = c;
                     this.pc = pc;
-                    this.stretchMin = stretchMin;
-                    this.stretchMax = stretchMax;
+                    this.stretchMin = stretchMin * stretchModifier;
+                    this.stretchMax = stretchMax * stretchModifier;
                     this.growMin = growMin;
                     this.growMax = growMax;
                     this.isWhite = isWhite || false;
+                    this.insectType = insectType;
+                    // Offset maior para garantir que o inseto fique ao redor, não em cima
+                    let offsetDist = p.random(12, 20);
+                    let offsetAng = p.random(p.TWO_PI);
+                    this.insectOffset = p.createVector(p.cos(offsetAng) * offsetDist, p.sin(offsetAng) * offsetDist);
+                    // Ângulo de rotação do inseto (para onde ele aponta)
+                    this.insectAngle = p.random(p.TWO_PI);
                     this.petals = [];
                     this.life = 255;
                     this.init();
@@ -155,7 +213,6 @@ createApp({
                             p.random(this.stretchMin, this.stretchMax),
                             startAngle + i * angle,
                             angle,
-                            // Usa a velocidade de crescimento específica da espécie
                             p.random(this.growMin, this.growMax),
                             this
                         ));
@@ -163,7 +220,6 @@ createApp({
                 }
 
                 decreaseLife() {
-                    // Desvanecimento mais lento para acompanhar a animação lenta
                     this.life -= 0.6;
                 }
 
@@ -178,6 +234,18 @@ createApp({
                         petal.render();
                     }
                     p.pop();
+
+                    // Desenha o inseto usando a posição relativa e o ciclo de vida da flor
+                    if (this.insectType && this.life > 0) {
+                        // O inseto só aparece quando a flor já cresceu um pouco (vida > 200) para não "brotar" estranho
+                        if (this.petals[0].r > this.r * 0.5) {
+                            if (this.insectType === 'bee') {
+                                drawBee(this.pos.x + this.insectOffset.x, this.pos.y + this.insectOffset.y, this.life, this.insectAngle);
+                            } else if (this.insectType === 'butterfly') {
+                                drawButterfly(this.pos.x + this.insectOffset.x, this.pos.y + this.insectOffset.y, this.life, this.insectAngle);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -189,8 +257,9 @@ createApp({
                 return p.createVector((p.width / 2) + x, (p.height / 2 - 55) + y);
             }
 
-            // Função atualizada para aceitar um modificador de tamanho (para flores secundárias)
-            function createRandomBloom(pos, sizeModifier = 1) {
+            // Função atualizada para aceitar modificadores e insetos
+            function createRandomBloom(pos, sizeModifier = 1, allowInsects = false) {
+                // Ainda escolhemos uma espécie base para pegar velocidades de crescimento e cores
                 let species = p.random(flowerTypes);
                 let colorKeys = Object.keys(colorPalettes);
                 let colorName = p.random(colorKeys);
@@ -202,9 +271,24 @@ createApp({
                     p.random(palette.b[0], palette.b[1])
                 );
 
-                // Aplica o modificador de tamanho (flores secundárias são menores)
                 let r = p.random(options.bloomRadius.min, options.bloomRadius.max) * sizeModifier;
-                let pc = p.floor(p.random(species.pcMin, species.pcMax));
+
+                // --- MUDANÇA 1: Contagem de Pétalas Altamente Randômica ---
+                // Ignora os limites da espécie e define um intervalo global de 4 a 100.
+                // p.floor(p.random(min, max_exclusivo))
+                let pc = p.floor(p.random(4, 101));
+
+                // --- MUDANÇA 2: "Espichamento" Mais Extremo ---
+                // Aumentamos o alcance do modificador.
+                // 0.5 = metade do tamanho normal (bem comprimida)
+                // 3.0 = triplo do tamanho normal (muito espichada)
+                let stretchModifier = p.random(0.5, 3.0);
+
+                let insectType = null;
+                // Chance de 40% de ter inseto nas flores secundárias
+                if (allowInsects && p.random() < 0.4) {
+                    insectType = p.random(['bee', 'butterfly']);
+                }
 
                 blooms.push(new Bloom(
                     pos, r, c, pc,
@@ -212,7 +296,9 @@ createApp({
                     species.stretchMax,
                     species.growMin,
                     species.growMax,
-                    palette.isWhite
+                    palette.isWhite,
+                    stretchModifier, // Passa o novo modificador extremo
+                    insectType
                 ));
             }
 
@@ -226,11 +312,9 @@ createApp({
             };
 
             p.draw = () => {
-                // Fade muito sutil para manter as cores vibrantes por mais tempo
-                p.background(255, 255, 238, 1.5);
+                p.background(255, 255, 238, 3);
 
                 if (startHeart.value) {
-                    // Frequência de desenho aumentada (a cada 3 frames) para compensar a lentidão
                     if (p.frameCount % 3 === 0) {
                         let target = getHeartPoint(angle);
                         let draw = true;
@@ -244,25 +328,20 @@ createApp({
 
                         if (draw) {
                             heartPoints.push(target);
-                            // Cria a flor principal do caminho
-                            createRandomBloom(target);
+                            createRandomBloom(target, 1, false); // Flor principal sem insetos
 
-                            // --- LÓGICA DE EXPLOSÃO DE DIVERSIDADE ---
-                            // 35% de chance de gerar flores secundárias ao redor
                             if (p.random() < 0.35) {
-                                let extraBlooms = p.floor(p.random(1, 4)); // 1 a 3 flores extras
+                                let extraBlooms = p.floor(p.random(1, 4));
                                 for (let i = 0; i < extraBlooms; i++) {
-                                    // Usa distribuição Gaussiana para agrupar organicamente ao redor do ponto principal
-                                    let offsetX = p.randomGaussian(0, 20); // Espalhamento de ~20px
+                                    let offsetX = p.randomGaussian(0, 20);
                                     let offsetY = p.randomGaussian(0, 20);
                                     let newPos = p.createVector(target.x + offsetX, target.y + offsetY);
-                                    // Cria flor secundária (0.7x do tamanho normal)
-                                    createRandomBloom(newPos, 0.7);
+                                    // Flor secundária COM chance de inseto
+                                    createRandomBloom(newPos, 0.7, true);
                                 }
                             }
                         }
 
-                        // Loop Flow Lento
                         if (angle >= 30) {
                             angle = 10;
                             heartPoints = [];
@@ -271,8 +350,7 @@ createApp({
                                 setTimeout(() => { showLoveU.value = true; }, 3000);
                             }
                         } else {
-                            // VELOCIDADE DO CORAÇÃO: Muito mais lenta agora
-                            angle += 0.02;
+                            angle += 0.06;
                         }
                     }
                 }
@@ -324,7 +402,7 @@ createApp({
 
         onMounted(() => {
             timeElapse();
-            clockInterval = setInterval(timeElapse, 300);
+            clockInterval = setInterval(timeElapse, 500);
             startTypewriter();
             myP5 = new p5(sketch, gardenContainer.value);
         });
