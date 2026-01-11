@@ -1,104 +1,131 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+
 <head>
-<script src="https://kit.fontawesome.com/a14ae32021.js" crossorigin="anonymous"></script>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>This one is for my Varchhu</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Para Rebeca</title>
 
-<style type="text/css">
-@font-face {
-	font-family: digit;
-	src: url('digital-7_mono.ttf') format("truetype");
-}
-</style>
-<link href="css/default.css" type="text/css" rel="stylesheet">
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/garden.js"></script>
-<script type="text/javascript" src="js/functions.js"></script>
+	<script src="https://kit.fontawesome.com/a14ae32021.js" crossorigin="anonymous"></script>
 
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<script>
+		tailwind.config = {
+			theme: {
+				extend: {
+					colors: {
+						cream: '#ffe',
+					},
+					fontFamily: {
+						digit: ['digit', 'monospace'],
+						sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+					}
+				}
+			}
+		}
+	</script>
+
+	<style>
+		@font-face {
+			font-family: 'digit';
+			src: url('digital-7_mono.ttf') format("truetype");
+		}
+
+		.fade-enter-active,
+		.fade-leave-active {
+			transition: opacity 2s ease;
+		}
+
+		.fade-enter-from,
+		.fade-leave-to {
+			opacity: 0;
+		}
+
+		#code {
+			font-family: 'Consolas', 'Monaco', monospace;
+		}
+	</style>
 </head>
 
-<body>
+<body class="bg-[#ffe] m-0 p-0 text-gray-800 overflow-x-hidden font-sans">
 
-<div id="mainDiv">
-	<div id="content">
-		<div id="code">
-			<span class="comments">/**</span><br />
-			<span class="space"/><span class="comments">*THE CODE OF LOVE</span><br />
-			<span class="space"/><span class="comments">*/</span><br />
-			Hey Girl !<br />
-			Do you remember the day we first met?<br />
-			<span class="comments">// The ET-LAB Friday. </span><br />
-			Since that day a spark begun;<br />
-			<span class="comments">// Your face Your Voice Your Words.</span><br />
-			Your everything got imprinted in my heart;<br />
-			As the time went on;<br />
-			The Bond grew stronger and stronger;<br />
-			Journey from Infatuation to Love;<br />
-			We have traveled a long way together;<br />
-			There have been fights ;<br />
-			<span class="comments">// And I'm sure there will be more.</span><br />
-			But our Bond will always grow back Stronger;<br />
-			<br>
-			<br>
-			All I want to say is:<br />
-			Baby, I will love you forever;<br />
-			<br>
-			<br>
-			Now If you want to hug me you can touch the heart below<br />
-			<br>
-			<span id="heartspan">
-			<a href="image.jpg"><i class="fas fa-heart" id="icon"></i></a>
-			</span>
-		</div>
-		<div id="loveHeart">
-			<canvas id="garden"></canvas>
-			<div id="words">
-				<div id="messages">
-					वर्षा ऋतु FOREVER
-					<div id="elapseClock"></div>
+	<div id="app" class="w-full min-h-screen flex flex-col items-center p-4">
+
+		<div id="top-section"
+			class="w-full flex flex-col lg:flex-row items-center lg:items-start lg:justify-evenly lg:pt-12 mb-12">
+
+			<div id="content-text"
+				class="order-2 lg:order-1 w-full max-w-[500px] mt-8 lg:mt-12 text-center lg:text-left z-10 min-h-[450px] flex flex-col justify-center"
+				v-show="showCode">
+
+				<div class="bg-white/40 p-4 rounded-lg shadow-sm border border-gray-200/50 backdrop-blur-sm h-full">
+					<span class="text-green-600 font-bold block mb-2">/**</span>
+					<span class="text-green-600 font-bold block mb-2 ml-4">* O CÓDIGO DO NOSSO AMOR</span>
+					<span class="text-green-600 font-bold block mb-4">*/</span>
+
+					<div v-html="typedText" class="text-base leading-relaxed whitespace-pre-wrap text-gray-800"></div>
+
+					<div v-show="typingFinished" class="mt-8 text-center animate-pulse">
+						<i class="fas fa-heart text-5xl text-red-500 drop-shadow-md"></i>
+					</div>
 				</div>
-				<div id="loveu">
-					I LOVE YOU SO MUCH<br/>
-					<div class="signature">- RITVIK</div>
+			</div>
+
+			<div id="loveHeart" ref="loveHeartRef"
+				class="order-1 lg:order-2 w-full max-w-[670px] aspect-square relative mb-4 lg:mb-0">
+
+				<div id="garden" ref="gardenContainer" class="w-full h-full block"></div>
+
+				<div id="words"
+					class="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center pointer-events-none">
+					<transition name="fade">
+						<div v-if="showMessages" class="text-center">
+							<div class="text-3xl font-bold text-pink-600 mb-2 drop-shadow-sm font-sans">
+								Rebeca & Lucas
+							</div>
+							<div id="elapseClock" class="text-gray-600 text-xl" v-html="elapsedTime"></div>
+						</div>
+					</transition>
+
+					<transition name="fade">
+						<div v-if="showLoveU" class="mt-8 text-center">
+							<div class="text-2xl text-pink-600 font-bold drop-shadow-sm">
+								Eu te amo muito.
+							</div>
+							<div class="mt-2 text-lg italic text-pink-500">
+								- Lucas
+							</div>
+						</div>
+					</transition>
 				</div>
 			</div>
 		</div>
+
+		<div id="playlist-section" class="w-full max-w-4xl z-10 pb-12">
+			<div class="bg-white/40 backdrop-blur-md border border-gray-200/50 rounded-xl p-6 shadow-lg">
+
+				<h3 class="text-center text-gray-600 text-xl font-mono mb-6 border-b border-gray-300/50 pb-2">
+					<i class="fas fa-music mr-2"></i> Nossa Trilha Sonora
+				</h3>
+
+				<div class="w-full aspect-video rounded-lg overflow-hidden shadow-md">
+					<iframe class="w-full h-full"
+						src="https://www.youtube.com/embed/videoseries?si=kZ-9a64unvOJtfe8&amp;list=PL2sFM1Ovn9SLAZBhnRD0XRP4vsAlN8YmK"
+						title="YouTube video player" frameborder="0"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+						referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+					</iframe>
+				</div>
+
+			</div>
+		</div>
+
 	</div>
-</div>
 
-<script type="text/javascript">
-var offsetX = $("#loveHeart").width() / 2;
-var offsetY = $("#loveHeart").height() / 2 - 55;
-var together = new Date();
-together.setFullYear(2016, 8, 5);
-together.setHours(16);
-together.setMinutes(30);
-together.setSeconds(0);
-together.setMilliseconds(0);
-
-if (!document.createElement('canvas').getContext) {
-	var msg = document.createElement("div");
-	msg.id = "errorMsg";
-	msg.innerHTML = "Your browser doesn't support HTML5!<br/>Recommend use Chrome 14+/IE 9+/Firefox 7+/Safari 4+"; 
-	document.body.appendChild(msg);
-	$("#code").css("display", "none")
-	$("#copyright").css("position", "absolute");
-	$("#copyright").css("bottom", "10px");
-	document.execCommand("stop");
-} else {
-	setTimeout(function () {
-		startHeartAnimation();
-	}, 5000);
-
-	timeElapse(together);
-	setInterval(function () {
-		timeElapse(together);
-	}, 500);
-
-	adjustCodePosition();
-	$("#code").typewriter();
-}
-</script>
+	<script type="module" src="js/app.js"></script>
 </body>
+
 </html>
