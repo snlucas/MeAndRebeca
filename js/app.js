@@ -1,6 +1,6 @@
 /*
  * app.js - Vue 3 + p5.js + Tailwind
- * Atualização: Insetos Nítidos (Silhuetas Pretas) inspirados nas referências
+ * Atualização: Carregamento de dados externos (JSON) - Profissional
  */
 
 const { createApp, ref, onMounted, onBeforeUnmount } = Vue;
@@ -17,24 +17,8 @@ createApp({
         const loveHeartRef = ref(null);
         const gardenContainer = ref(null);
 
-        // --- POEMA ---
-        const fullPoem = `
-            <span class="text-gray-800">Oi, Meu Amor!</span><br />
-            <span class="text-gray-800">Você lembra do dia em que nos conhecemos?</span><br />
-            <span class="text-green-600 font-mono text-sm">// Foi um momento único.</span><br />
-            <span class="text-gray-800">Desde aquele dia, algo mudou em mim;</span><br />
-            <span class="text-green-600 font-mono text-sm">// Seu rosto, sua voz, seu jeito.</span><br />
-            <span class="text-gray-800">Tudo em você ficou gravado no meu coração.</span><br />
-            <span class="text-gray-800">Conforme o tempo passou,</span><br />
-            <span class="text-gray-800">O nosso laço ficou mais e mais forte.</span><br />
-            <span class="text-gray-800">Viajamos juntos um longo caminho.</span><br />
-            <span class="text-gray-800">Houve momentos difíceis;</span><br />
-            <span class="text-green-600 font-mono text-sm">// E tenho certeza que superaremos outros.</span><br />
-            <span class="text-gray-800">Mas nosso amor sempre volta mais forte.</span><br />
-            <br>
-            <span class="text-gray-800">Tudo que eu quero dizer é:</span><br />
-            <span class="text-pink-600 font-bold">Rebeca, eu vou te amar para sempre.</span><br />
-            <br>`;
+        // Variável para armazenar o poema processado (HTML string)
+        let fullPoemHTML = '';
 
         const together = new Date();
         together.setFullYear(2026, 0, 3);
@@ -43,13 +27,46 @@ createApp({
         let myP5 = null;
         let clockInterval = null;
 
+        // --- SISTEMA DE CARREGAMENTO DE DADOS ---
+
+        // Mapa de estilos para manter o código limpo
+        const styles = {
+            normal: "text-gray-800",
+            comment: "text-green-600 font-mono text-sm",
+            highlight: "text-pink-600 font-bold",
+            break: "" // Apenas pula linha
+        };
+
+        const fetchPoem = async () => {
+            try {
+                const response = await fetch('../poem.json');
+                if (!response.ok) throw new Error('Erro ao carregar poema');
+                const data = await response.json();
+                fullPoemHTML = processPoem(data);
+
+                // Só inicia a digitação após carregar e processar o texto
+                startTypewriter();
+            } catch (error) {
+                console.error("Falha ao carregar o poema:", error);
+                typedText.value = "<span class='text-red-500'>Erro ao carregar o conteúdo.</span>";
+            }
+        };
+
+        const processPoem = (data) => {
+            return data.map(line => {
+                if (line.type === 'break') return '<br>';
+                // Monta o HTML dinamicamente baseado no tipo
+                return `<span class="${styles[line.type]}">${line.text}</span><br />`;
+            }).join('');
+        };
+
+        // --- LÓGICA DO P5.JS (Mantida idêntica à anterior) ---
         const sketch = (p) => {
             let blooms = [];
             let heartPoints = [];
             let angle = 10;
             let gardenCanvas;
 
-            // --- CONFIGURAÇÃO GENÉTICA ---
             const flowerTypes = [
                 { name: 'Tulipa', pcMin: 5, pcMax: 6, stretchMin: 1.5, stretchMax: 2.0, growMin: 0.03, growMax: 0.06 },
                 { name: 'Rosa', pcMin: 10, pcMax: 15, stretchMin: 0.8, stretchMax: 1.2, growMin: 0.02, growMax: 0.05 },
@@ -77,30 +94,20 @@ createApp({
                 bloomRadius: { min: 8, max: 12 }
             };
 
-            // --- DESENHO VETORIAL DE INSETOS (Silhuetas Nítidas) ---
-
             function drawBee(x, y, alpha, angle) {
                 p.push();
                 p.translate(x, y);
-                p.rotate(angle); // Rotação aleatória
-                p.scale(0.8); // Ajuste de tamanho global
-
+                p.rotate(angle);
+                p.scale(0.8);
                 p.noStroke();
-                p.fill(20, alpha); // Preto quase sólido (levemente suave para não serrilhar)
-
-                // Corpo (Oval robusto)
+                p.fill(20, alpha);
                 p.ellipse(0, 0, 10, 7);
-
-                // Cabeça (Círculo na ponta)
                 p.circle(6, 0, 4);
-
-                // Asas (Forma de gota apontando para trás/cima)
                 p.push();
-                p.rotate(p.QUARTER_PI); // Inclina as asas
-                p.ellipse(-2, -6, 6, 10); // Asa 1
-                p.ellipse(2, -6, 6, 10);  // Asa 2
+                p.rotate(p.QUARTER_PI);
+                p.ellipse(-2, -6, 6, 10);
+                p.ellipse(2, -6, 6, 10);
                 p.pop();
-
                 p.pop();
             }
 
@@ -108,28 +115,20 @@ createApp({
                 p.push();
                 p.translate(x, y);
                 p.rotate(angle);
-                p.scale(0.7); // Borboletas delicadas
-
+                p.scale(0.7);
                 p.noStroke();
-                p.fill(20, alpha); // Preto sólido
-
-                // Corpo Central
+                p.fill(20, alpha);
                 p.ellipse(0, 0, 3, 12);
-
-                // Asas Superiores (Grandes e arredondadas)
                 p.push();
                 p.rotate(p.radians(-20));
-                p.ellipse(-6, -6, 10, 10); // Esq Sup
-                p.ellipse(6, -6, 10, 10);  // Dir Sup
+                p.ellipse(-6, -6, 10, 10);
+                p.ellipse(6, -6, 10, 10);
                 p.pop();
-
-                // Asas Inferiores (Menores)
                 p.push();
                 p.rotate(p.radians(10));
-                p.ellipse(-5, 4, 7, 9);  // Esq Inf
-                p.ellipse(5, 4, 7, 9);   // Dir Inf
+                p.ellipse(-5, 4, 7, 9);
+                p.ellipse(5, 4, 7, 9);
                 p.pop();
-
                 p.pop();
             }
 
@@ -152,7 +151,6 @@ createApp({
                     let v4 = v2.copy().mult(this.stretchB);
 
                     p.noFill();
-
                     let c = this.bloom.c;
 
                     if (this.bloom.isWhite) {
@@ -193,11 +191,9 @@ createApp({
                     this.growMax = growMax;
                     this.isWhite = isWhite || false;
                     this.insectType = insectType;
-                    // Offset maior para garantir que o inseto fique ao redor, não em cima
                     let offsetDist = p.random(12, 20);
                     let offsetAng = p.random(p.TWO_PI);
                     this.insectOffset = p.createVector(p.cos(offsetAng) * offsetDist, p.sin(offsetAng) * offsetDist);
-                    // Ângulo de rotação do inseto (para onde ele aponta)
                     this.insectAngle = p.random(p.TWO_PI);
                     this.petals = [];
                     this.life = 255;
@@ -235,9 +231,7 @@ createApp({
                     }
                     p.pop();
 
-                    // Desenha o inseto usando a posição relativa e o ciclo de vida da flor
                     if (this.insectType && this.life > 0) {
-                        // O inseto só aparece quando a flor já cresceu um pouco (vida > 200) para não "brotar" estranho
                         if (this.petals[0].r > this.r * 0.5) {
                             if (this.insectType === 'bee') {
                                 drawBee(this.pos.x + this.insectOffset.x, this.pos.y + this.insectOffset.y, this.life, this.insectAngle);
@@ -251,15 +245,21 @@ createApp({
 
             function getHeartPoint(ang) {
                 let t = ang / Math.PI;
-                let scaleFactor = p.width < 700 ? p.width / 700 : 1;
+                let safetyMargin = 0.75;
+                let scaleFactor = 1;
+
+                if (p.width < 700) {
+                    scaleFactor = (p.width / 700) * safetyMargin;
+                } else {
+                    scaleFactor = safetyMargin;
+                }
+
                 let x = (19.5 * scaleFactor) * (16 * Math.pow(Math.sin(t), 3));
                 let y = - (20 * scaleFactor) * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
                 return p.createVector((p.width / 2) + x, (p.height / 2 - 55) + y);
             }
 
-            // Função atualizada para aceitar modificadores e insetos
             function createRandomBloom(pos, sizeModifier = 1, allowInsects = false) {
-                // Ainda escolhemos uma espécie base para pegar velocidades de crescimento e cores
                 let species = p.random(flowerTypes);
                 let colorKeys = Object.keys(colorPalettes);
                 let colorName = p.random(colorKeys);
@@ -273,19 +273,15 @@ createApp({
 
                 let r = p.random(options.bloomRadius.min, options.bloomRadius.max) * sizeModifier;
 
-                // --- MUDANÇA 1: Contagem de Pétalas Altamente Randômica ---
-                // Ignora os limites da espécie e define um intervalo global de 4 a 100.
-                // p.floor(p.random(min, max_exclusivo))
+                // Contagem de pétalas aleatória (4 a 100)
                 let pc = p.floor(p.random(4, 101));
 
-                // --- MUDANÇA 2: "Espichamento" Mais Extremo ---
-                // Aumentamos o alcance do modificador.
-                // 0.5 = metade do tamanho normal (bem comprimida)
-                // 3.0 = triplo do tamanho normal (muito espichada)
-                let stretchModifier = p.random(0.5, 3.0);
+                // Responsividade no espichamento
+                let maxStretch = 3.0;
+                if (p.width < 700) maxStretch = 1.5;
+                let stretchModifier = p.random(0.5, maxStretch);
 
                 let insectType = null;
-                // Chance de 40% de ter inseto nas flores secundárias
                 if (allowInsects && p.random() < 0.4) {
                     insectType = p.random(['bee', 'butterfly']);
                 }
@@ -297,7 +293,7 @@ createApp({
                     species.growMin,
                     species.growMax,
                     palette.isWhite,
-                    stretchModifier, // Passa o novo modificador extremo
+                    stretchModifier,
                     insectType
                 ));
             }
@@ -328,7 +324,7 @@ createApp({
 
                         if (draw) {
                             heartPoints.push(target);
-                            createRandomBloom(target, 1, false); // Flor principal sem insetos
+                            createRandomBloom(target, 1, false);
 
                             if (p.random() < 0.35) {
                                 let extraBlooms = p.floor(p.random(1, 4));
@@ -336,7 +332,6 @@ createApp({
                                     let offsetX = p.randomGaussian(0, 20);
                                     let offsetY = p.randomGaussian(0, 20);
                                     let newPos = p.createVector(target.x + offsetX, target.y + offsetY);
-                                    // Flor secundária COM chance de inseto
                                     createRandomBloom(newPos, 0.7, true);
                                 }
                             }
@@ -377,11 +372,17 @@ createApp({
             }, 3000);
 
             let progress = 0;
-            const str = fullPoem;
+            // Usa a variável que foi preenchida pelo processPoem (fetch)
+            const str = fullPoemHTML;
+
             const timer = setInterval(() => {
                 const current = str.substr(progress, 1);
-                if (current === '<') progress = str.indexOf('>', progress) + 1;
-                else progress++;
+                if (current === '<') {
+                    // Avança até fechar a tag HTML
+                    progress = str.indexOf('>', progress) + 1;
+                } else {
+                    progress++;
+                }
 
                 typedText.value = str.substring(0, progress) + (progress & 1 ? '_' : '');
 
@@ -397,13 +398,16 @@ createApp({
             const current = new Date();
             const seconds = (current.getTime() - together.getTime()) / 1000;
             const days = Math.floor(seconds / (3600 * 24));
-            elapsedTime.value = `Juntos há <span class="font-digit text-4xl font-bold">${days}</span> dias`;
+            elapsedTime.value = `Cúmplices neste mundo há <br /><span class="font-digit text-4xl font-bold">${days}</span> dias`;
         };
 
         onMounted(() => {
             timeElapse();
             clockInterval = setInterval(timeElapse, 500);
-            startTypewriter();
+
+            // Inicia o carregamento do poema
+            fetchPoem();
+
             myP5 = new p5(sketch, gardenContainer.value);
         });
 
