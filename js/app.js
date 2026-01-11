@@ -1,12 +1,12 @@
 /*
- * app.js - Vue 3 + p5.js + Tailwind Classes
+ * app.js - Vue 3 + p5.js + Tailwind
+ * Atualização: Cores vibrantes, Animação lenta e Explosão de diversidade (flores secundárias)
  */
 
 const { createApp, ref, onMounted, onBeforeUnmount } = Vue;
 
 createApp({
     setup() {
-        // --- ESTADO REATIVO ---
         const showCode = ref(true);
         const showMessages = ref(false);
         const showLoveU = ref(false);
@@ -17,8 +17,7 @@ createApp({
         const loveHeartRef = ref(null);
         const gardenContainer = ref(null);
 
-        // --- POEMA COM CLASSES TAILWIND ---
-        // Alteramos as classes CSS manuais para utilitários do Tailwind
+        // --- POEMA ---
         const fullPoem = `
             <span class="text-gray-800">Oi, Meu Amor!</span><br />
             <span class="text-gray-800">Você lembra do dia em que nos conhecemos?</span><br />
@@ -37,7 +36,6 @@ createApp({
             <span class="text-pink-600 font-bold">Rebeca, eu vou te amar para sempre.</span><br />
             <br>`;
 
-        // --- CONFIGURAÇÃO DA DATA ---
         const together = new Date();
         together.setFullYear(2026, 0, 3);
         together.setHours(0, 0, 0, 0);
@@ -45,28 +43,41 @@ createApp({
         let myP5 = null;
         let clockInterval = null;
 
-        // ============================================================
-        // LÓGICA DO P5.JS (Igual à versão anterior)
-        // ============================================================
         const sketch = (p) => {
             let blooms = [];
             let heartPoints = [];
             let angle = 10;
-            let animationFinished = false;
             let gardenCanvas;
 
+            // --- CONFIGURAÇÃO GENÉTICA (VELOCIDADES LENTAS) ---
+            // Adicionei growMin/growMax para controlar a velocidade de desabrochar por espécie
+            const flowerTypes = [
+                { name: 'Tulipa', pcMin: 5, pcMax: 6, stretchMin: 1.5, stretchMax: 2.0, growMin: 0.03, growMax: 0.06 },
+                { name: 'Rosa', pcMin: 10, pcMax: 15, stretchMin: 0.8, stretchMax: 1.2, growMin: 0.02, growMax: 0.05 },
+                { name: 'Falsa Era', pcMin: 4, pcMax: 5, stretchMin: 2.5, stretchMax: 3.5, growMin: 0.04, growMax: 0.08 },
+                { name: 'Carnation', pcMin: 12, pcMax: 20, stretchMin: 0.5, stretchMax: 1.0, growMin: 0.02, growMax: 0.04 },
+                { name: 'Alstroemeria', pcMin: 3, pcMax: 6, stretchMin: 1.8, stretchMax: 2.2, growMin: 0.03, growMax: 0.07 },
+                { name: 'Iris', pcMin: 3, pcMax: 3, stretchMin: 2.0, stretchMax: 3.0, growMin: 0.04, growMax: 0.08 },
+                { name: 'Magnolia', pcMin: 6, pcMax: 9, stretchMin: 1.2, stretchMax: 1.5, growMin: 0.02, growMax: 0.05 },
+                { name: 'Begonia', pcMin: 4, pcMax: 4, stretchMin: 1.0, stretchMax: 1.3, growMin: 0.03, growMax: 0.06 },
+                { name: 'Zinia', pcMin: 15, pcMax: 25, stretchMin: 0.3, stretchMax: 0.6, growMin: 0.01, growMax: 0.03 },
+                { name: 'Petunia', pcMin: 5, pcMax: 5, stretchMin: 0.6, stretchMax: 0.9, growMin: 0.03, growMax: 0.06 }
+            ];
+
+            // --- CORES VIBRANTES E PROFISSIONAIS ---
+            // Intervalos RGB mais estreitos e saturados
+            const colorPalettes = {
+                'rosa': { r: [220, 255], g: [20, 100], b: [100, 180] }, // Rosa choque/magenta
+                'amarelo': { r: [230, 255], g: [200, 240], b: [0, 50] },    // Amarelo ouro
+                'vermelho': { r: [200, 255], g: [0, 30], b: [0, 30] },    // Vermelho sangue
+                'jade': { r: [0, 50], g: [180, 220], b: [130, 180] }, // Verdeazulado profundo
+                'roxo': { r: [100, 160], g: [0, 50], b: [180, 240] }, // Roxo real
+                'azul': { r: [0, 60], g: [80, 150], b: [200, 255] }, // Azul oceano
+                'branco': { r: [245, 255], g: [245, 255], b: [245, 255], isWhite: true }
+            };
+
             const options = {
-                petalCount: { min: 5, max: 7 },
-                petalStretch: { min: 0.5, max: 2.5 },
-                growFactor: { min: 0.1, max: 1 },
-                bloomRadius: { min: 8, max: 12 },
-                growSpeed: 1,
-                color: {
-                    rmin: 180, rmax: 255,
-                    gmin: 0, gmax: 80,
-                    bmin: 80, bmax: 200,
-                    opacity: 15
-                }
+                bloomRadius: { min: 8, max: 12 }
             };
 
             class Petal {
@@ -81,15 +92,28 @@ createApp({
                     this.isfinished = false;
                 }
 
-                display() {
+                display(currentAlpha) {
                     let v1 = p.createVector(0, this.r).rotate(p.radians(this.startAngle));
                     let v2 = v1.copy().rotate(p.radians(this.angle));
                     let v3 = v1.copy().mult(this.stretchA);
                     let v4 = v2.copy().mult(this.stretchB);
 
                     p.noFill();
-                    p.stroke(this.bloom.c);
-                    p.strokeWeight(0.5);
+
+                    let c = this.bloom.c;
+
+                    if (this.bloom.isWhite) {
+                        // Branco Profissional: Borda cinza chumbo elegante, não preto chapado
+                        p.stroke(60, 60, 70, currentAlpha);
+                        p.strokeWeight(0.8);
+                        // Preenchimento branco sutil para destacar do fundo
+                        p.fill(255, 255, 255, currentAlpha * 0.8);
+                    } else {
+                        c.setAlpha(currentAlpha);
+                        p.stroke(c);
+                        p.strokeWeight(0.8);
+                    }
+
                     p.beginShape();
                     p.vertex(v1.x, v1.y);
                     p.bezierVertex(v3.x, v3.y, v4.x, v4.y, v2.x, v2.y);
@@ -99,22 +123,26 @@ createApp({
                 render() {
                     if (this.r <= this.bloom.r) {
                         this.r += this.growFactor;
-                        this.display();
                     } else {
                         this.isfinished = true;
                     }
-
-                    this.display();
+                    this.display(this.bloom.life);
                 }
             }
 
             class Bloom {
-                constructor(pos, r, c, pc) {
+                constructor(pos, r, c, pc, stretchMin, stretchMax, growMin, growMax, isWhite) {
                     this.pos = pos;
                     this.r = r;
                     this.c = c;
                     this.pc = pc;
+                    this.stretchMin = stretchMin;
+                    this.stretchMax = stretchMax;
+                    this.growMin = growMin;
+                    this.growMax = growMax;
+                    this.isWhite = isWhite || false;
                     this.petals = [];
+                    this.life = 255;
                     this.init();
                 }
 
@@ -123,91 +151,137 @@ createApp({
                     let startAngle = p.random(0, 90);
                     for (let i = 0; i < this.pc; i++) {
                         this.petals.push(new Petal(
-                            p.random(options.petalStretch.min, options.petalStretch.max),
-                            p.random(options.petalStretch.min, options.petalStretch.max),
+                            p.random(this.stretchMin, this.stretchMax),
+                            p.random(this.stretchMin, this.stretchMax),
                             startAngle + i * angle,
                             angle,
-                            p.random(options.growFactor.min, options.growFactor.max),
+                            // Usa a velocidade de crescimento específica da espécie
+                            p.random(this.growMin, this.growMax),
                             this
                         ));
                     }
                 }
 
+                decreaseLife() {
+                    // Desvanecimento mais lento para acompanhar a animação lenta
+                    this.life -= 0.6;
+                }
+
+                isDead() {
+                    return this.life < 0;
+                }
+
                 draw() {
-                    let isfinished = true;
                     p.push();
                     p.translate(this.pos.x, this.pos.y);
                     for (let petal of this.petals) {
                         petal.render();
-                        if (!petal.isfinished) isfinished = false;
                     }
                     p.pop();
-                    return isfinished;
                 }
             }
 
             function getHeartPoint(ang) {
                 let t = ang / Math.PI;
-                let scaleFactor = 1;
-                // Ajuste responsivo baseado na largura da tela
-                if (p.width < 700) {
-                    scaleFactor = p.width / 700;
-                }
-
+                let scaleFactor = p.width < 700 ? p.width / 700 : 1;
                 let x = (19.5 * scaleFactor) * (16 * Math.pow(Math.sin(t), 3));
                 let y = - (20 * scaleFactor) * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-
                 return p.createVector((p.width / 2) + x, (p.height / 2 - 55) + y);
             }
 
-            function createRandomBloom(pos) {
-                let r = p.random(options.bloomRadius.min, options.bloomRadius.max);
-                let red = p.random(options.color.rmin, options.color.rmax);
-                let green = p.random(options.color.gmin, options.color.gmax);
-                let blue = p.random(options.color.bmin, options.color.bmax);
-                if (Math.abs(red - green) < 20 && Math.abs(green - blue) < 20) {
-                    red = 255; green = 100; blue = 100;
-                }
-                let c = p.color(red, green, blue, options.color.opacity);
-                let pc = p.floor(p.random(options.petalCount.min, options.petalCount.max));
-                blooms.push(new Bloom(pos, r, c, pc));
+            // Função atualizada para aceitar um modificador de tamanho (para flores secundárias)
+            function createRandomBloom(pos, sizeModifier = 1) {
+                let species = p.random(flowerTypes);
+                let colorKeys = Object.keys(colorPalettes);
+                let colorName = p.random(colorKeys);
+                let palette = colorPalettes[colorName];
+
+                let c = p.color(
+                    p.random(palette.r[0], palette.r[1]),
+                    p.random(palette.g[0], palette.g[1]),
+                    p.random(palette.b[0], palette.b[1])
+                );
+
+                // Aplica o modificador de tamanho (flores secundárias são menores)
+                let r = p.random(options.bloomRadius.min, options.bloomRadius.max) * sizeModifier;
+                let pc = p.floor(p.random(species.pcMin, species.pcMax));
+
+                blooms.push(new Bloom(
+                    pos, r, c, pc,
+                    species.stretchMin,
+                    species.stretchMax,
+                    species.growMin,
+                    species.growMax,
+                    palette.isWhite
+                ));
             }
 
             p.setup = () => {
                 let w = gardenContainer.value.clientWidth;
                 let h = gardenContainer.value.clientHeight;
                 gardenCanvas = p.createCanvas(w, h);
-                p.background('#ffe'); // Mantendo o fundo creme via p5
+                p.background('#ffe');
                 p.frameRate(60);
                 p.blendMode(p.BLEND);
             };
 
             p.draw = () => {
-                if (startHeart.value && !animationFinished) {
-                    if (p.frameCount % 2 === 0) {
+                // Fade muito sutil para manter as cores vibrantes por mais tempo
+                p.background(255, 255, 238, 1.5);
+
+                if (startHeart.value) {
+                    // Frequência de desenho aumentada (a cada 3 frames) para compensar a lentidão
+                    if (p.frameCount % 3 === 0) {
                         let target = getHeartPoint(angle);
                         let draw = true;
+
                         for (let pt of heartPoints) {
-                            if (p.dist(pt.x, pt.y, target.x, target.y) < options.bloomRadius.max * 1.3) {
+                            if (p.dist(pt.x, pt.y, target.x, target.y) < options.bloomRadius.max * 1.1) {
                                 draw = false;
                                 break;
                             }
                         }
+
                         if (draw) {
                             heartPoints.push(target);
+                            // Cria a flor principal do caminho
                             createRandomBloom(target);
+
+                            // --- LÓGICA DE EXPLOSÃO DE DIVERSIDADE ---
+                            // 35% de chance de gerar flores secundárias ao redor
+                            if (p.random() < 0.35) {
+                                let extraBlooms = p.floor(p.random(1, 4)); // 1 a 3 flores extras
+                                for (let i = 0; i < extraBlooms; i++) {
+                                    // Usa distribuição Gaussiana para agrupar organicamente ao redor do ponto principal
+                                    let offsetX = p.randomGaussian(0, 20); // Espalhamento de ~20px
+                                    let offsetY = p.randomGaussian(0, 20);
+                                    let newPos = p.createVector(target.x + offsetX, target.y + offsetY);
+                                    // Cria flor secundária (0.7x do tamanho normal)
+                                    createRandomBloom(newPos, 0.7);
+                                }
+                            }
                         }
+
+                        // Loop Flow Lento
                         if (angle >= 30) {
-                            animationFinished = true;
-                            showMessages.value = true;
-                            setTimeout(() => { showLoveU.value = true; }, 3000);
+                            angle = 10;
+                            heartPoints = [];
+                            if (!showMessages.value) {
+                                showMessages.value = true;
+                                setTimeout(() => { showLoveU.value = true; }, 3000);
+                            }
                         } else {
-                            angle += 0.2;
+                            // VELOCIDADE DO CORAÇÃO: Muito mais lenta agora
+                            angle += 0.02;
                         }
                     }
                 }
+
                 for (let i = blooms.length - 1; i >= 0; i--) {
-                    blooms[i].draw();
+                    let b = blooms[i];
+                    b.draw();
+                    b.decreaseLife();
+                    if (b.isDead()) blooms.splice(i, 1);
                 }
             };
 
@@ -250,7 +324,7 @@ createApp({
 
         onMounted(() => {
             timeElapse();
-            clockInterval = setInterval(timeElapse, 500);
+            clockInterval = setInterval(timeElapse, 300);
             startTypewriter();
             myP5 = new p5(sketch, gardenContainer.value);
         });
