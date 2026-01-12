@@ -1,8 +1,3 @@
-/*
- * app.js - Vue 3 + p5.js + Tailwind
- * Atualização: Carregamento de dados externos (JSON) - Profissional
- */
-
 const { createApp, ref, onMounted, onBeforeUnmount } = Vue;
 
 createApp({
@@ -41,7 +36,7 @@ createApp({
             normal: "text-gray-800",
             comment: "text-green-600 font-mono text-sm",
             highlight: "text-pink-600 font-bold",
-            break: "" // Apenas pula linha
+            break: ""
         };
 
         const fetchPoem = async () => {
@@ -51,7 +46,6 @@ createApp({
                 const data = await response.json();
                 fullPoemHTML = processPoem(data);
 
-                // Só inicia a digitação após carregar e processar o texto
                 startTypewriter();
             } catch (error) {
                 console.error("Falha ao carregar o poema:", error);
@@ -72,12 +66,10 @@ createApp({
         const processPoem = (data) => {
             return data.map(line => {
                 if (line.type === 'break') return '<br>';
-                // Monta o HTML dinamicamente baseado no tipo
                 return `<span class="${styles[line.type]}">${line.text}</span><br />`;
             }).join('');
         };
 
-        // --- LÓGICA DO P5.JS (Mantida idêntica à anterior) ---
         const sketch = (p) => {
             let blooms = [];
             let heartPoints = [];
@@ -289,11 +281,8 @@ createApp({
                 );
 
                 let r = p.random(options.bloomRadius.min, options.bloomRadius.max) * sizeModifier;
-
-                // Contagem de pétalas aleatória (4 a 100)
                 let pc = p.floor(p.random(4, 101));
 
-                // Responsividade no espichamento
                 let maxStretch = 3.0;
                 if (p.width < 700) maxStretch = 1.5;
                 let stretchModifier = p.random(0.5, maxStretch);
@@ -389,13 +378,11 @@ createApp({
             }, 3000);
 
             let progress = 0;
-            // Usa a variável que foi preenchida pelo processPoem (fetch)
             const str = fullPoemHTML;
 
             const timer = setInterval(() => {
                 const current = str.substr(progress, 1);
                 if (current === '<') {
-                    // Avança até fechar a tag HTML
                     progress = str.indexOf('>', progress) + 1;
                 } else {
                     progress++;
