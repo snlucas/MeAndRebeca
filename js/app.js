@@ -16,8 +16,18 @@ createApp({
         const elapsedTime = ref('');
         const loveHeartRef = ref(null);
         const gardenContainer = ref(null);
+        const events = ref([]);
+        const currentYear = new Date().getFullYear();
 
-        // Variável para armazenar o poema processado (HTML string)
+        const categoryStyles = {
+            food: { icon: 'fas fa-utensils', color: 'text-orange-500', bg: 'bg-orange-50', border: 'border-orange-100' },
+            fun: { icon: 'fas fa-film', color: 'text-purple-500', bg: 'bg-purple-50', border: 'border-purple-100' },
+            travel: { icon: 'fas fa-plane', color: 'text-emerald-500', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+            birthday: { icon: 'fas fa-birthday-cake', color: 'text-pink-500', bg: 'bg-pink-50', border: 'border-pink-100' },
+            default: { icon: 'far fa-calendar', color: 'text-indigo-500', bg: 'bg-indigo-50', border: 'border-indigo-100' }
+        };
+        const getStyle = (type) => categoryStyles[type] || categoryStyles.default;
+
         let fullPoemHTML = '';
 
         const together = new Date();
@@ -27,9 +37,6 @@ createApp({
         let myP5 = null;
         let clockInterval = null;
 
-        // --- SISTEMA DE CARREGAMENTO DE DADOS ---
-
-        // Mapa de estilos para manter o código limpo
         const styles = {
             normal: "text-gray-800",
             comment: "text-green-600 font-mono text-sm",
@@ -49,6 +56,16 @@ createApp({
             } catch (error) {
                 console.error("Falha ao carregar o poema:", error);
                 typedText.value = "<span class='text-red-500'>Erro ao carregar o conteúdo.</span>";
+            }
+        };
+
+        const fetchEvents = async () => {
+            try {
+                const response = await fetch('events.json');
+                if (!response.ok) throw new Error('Erro ao carregar eventos');
+                events.value = await response.json();
+            } catch (error) {
+                console.error("Falha ao carregar eventos:", error);
             }
         };
 
@@ -405,8 +422,8 @@ createApp({
             timeElapse();
             clockInterval = setInterval(timeElapse, 500);
 
-            // Inicia o carregamento do poema
             fetchPoem();
+            fetchEvents();
 
             myP5 = new p5(sketch, gardenContainer.value);
         });
@@ -419,7 +436,8 @@ createApp({
         return {
             showCode, typedText, typingFinished,
             showMessages, showLoveU, elapsedTime,
-            gardenContainer, loveHeartRef
+            gardenContainer, loveHeartRef, events,
+            currentYear, getStyle
         };
     }
 }).mount('#app');
