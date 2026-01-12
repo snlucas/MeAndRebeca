@@ -43,7 +43,8 @@ createApp({
 
         const fetchPoem = async () => {
             try {
-                const response = await fetch('./poem.json');
+                // const response = await fetch('./poem.json'); --> local build
+                const response = await fetch('/MeAndRebeca/poem.json');
                 if (!response.ok) throw new Error('Erro ao carregar poema');
                 const data = await response.json();
                 fullPoemHTML = processPoem(data);
