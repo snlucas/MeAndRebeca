@@ -1,7 +1,18 @@
 [
     {
-        "type": "normal",
+        "type": "head",
         "text": "Oi, linda!"
+    },
+    {
+        "type": "break"
+    },
+    {
+        "type": "styleComment",
+        "text": "~~ ~~  ~~ ~~ ~~ ~~  ~~ ~~"
+    },
+    {
+        "type": "styleComment",
+        "text": "~~ ~~  ~~ ~~ ~~ ~~  ~~ ~~"
     },
     {
         "type": "break"
@@ -18,12 +29,26 @@
         "type": "break"
     },
     {
+        "type": "styleComment",
+        "text": "<~~ <~~ <~ <> ~> ~~> ~~>"
+    },
+    {
+        "type": "break"
+    },
+    {
         "type": "normal",
         "text": "Aos poucos fomos nos descobrindo e de forma gradual, a insegurança e desconfiança foram dando lugar à admiração e confiança."
     },
     {
         "type": "comment",
-        "text": "// Você é bonita, positiva, inteligente, artista, perseverante, carinhosa, ..., a lista é bem longa!"
+        "text": "// Você é bonita, positiva, inteligente, artista, perseverante, carinhosa, ..., ==> a lista é bem longa!"
+    },
+    {
+        "type": "break"
+    },
+    {
+        "type": "styleComment",
+        "text": "<~~ <~~ <~ <> ~> ~~> ~~>"
     },
     {
         "type": "break"
@@ -34,7 +59,14 @@
     },
     {
         "type": "comment",
-        "text": "// Desejo do fundo do coração que nossa relação seja duradoura e cheia de experiências marcantes e muito positivas."
+        "text": "// Desejo do fundo do coração <3 que nossa relação seja duradoura e cheia de experiências marcantes e muito positivas."
+    },
+    {
+        "type": "break"
+    },
+    {
+        "type": "styleComment",
+        "text": "<~~ <~~ <~ <+> ~> ~~> ~~>"
     },
     {
         "type": "break"

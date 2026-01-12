@@ -33,9 +33,11 @@ createApp({
         let clockInterval = null;
 
         const styles = {
+            head: "text-pink-800 font-serif text-4xl",
             normal: "text-gray-800",
-            comment: "text-green-600 font-mono text-sm",
-            highlight: "text-pink-600 font-bold",
+            comment: "text-green-700 font-mono text-sm",
+            styleComment: "text-pink-400 font-mono text-lg",
+            highlight: "text-pink-800 font-serif font-bold text-3xl",
             break: ""
         };
 
@@ -225,7 +227,7 @@ createApp({
                 }
 
                 decreaseLife() {
-                    this.life -= 0.6;
+                    this.life -= 0.3;
                 }
 
                 isDead() {

@@ -11,6 +11,9 @@
 	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 	<script src="https://cdn.tailwindcss.com"></script>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+		rel="stylesheet">
 
 	<script>
 		tailwind.config = {
@@ -22,6 +25,8 @@
 					fontFamily: {
 						digit: ['digit', 'monospace'],
 						sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+						serif: ['"Playfair Display"', 'serif'],
+						mono: ['"Fira Code"', 'monospace'],
 					}
 				}
 			}
@@ -29,11 +34,6 @@
 	</script>
 
 	<style>
-		@font-face {
-			font-family: 'digit';
-			src: url('digital-7_mono.ttf') format("truetype");
-		}
-
 		.fade-enter-active,
 		.fade-leave-active {
 			transition: opacity 2s ease;
@@ -45,7 +45,7 @@
 		}
 
 		#code {
-			font-family: 'Consolas', 'Monaco', monospace;
+			font-family: 'Fira Code', monospace;
 		}
 	</style>
 </head>
@@ -63,7 +63,8 @@
 
 				<div class="bg-white/40 p-4 rounded-lg shadow-sm border border-gray-200/50 backdrop-blur-sm h-full">
 					<span class="text-green-600 font-bold block mb-2">/**</span>
-					<span class="text-green-600 font-bold block mb-2 ml-4">* Querida Rebeca</span>
+					<span class="text-green-600 font-mono font-bold block mb-2 ml-4 text-sm">* Comemorando nossa
+						união 💗</span>
 					<span class="text-green-600 font-bold block mb-4">*/</span>
 
 					<div v-html="typedText" class="text-base leading-relaxed whitespace-pre-wrap text-gray-800"></div>
@@ -97,9 +98,9 @@
 							<transition name="fade">
 								<div v-if="showLoveU">
 									<div class="text-2xl text-pink-600 font-bold drop-shadow-sm">
-										Eu te amo 👩‍❤️‍💋‍👨
+										Te amo 👩‍❤️‍💋‍👨
 									</div>
-									<div class="mt-2 text-lg italic text-pink-500">
+									<div class="mt-2 font-serif text-lg italic text-pink-500">
 										- Lucas
 									</div>
 								</div>
@@ -165,12 +166,6 @@
 							</div>
 						</div>
 					</div>
-				</div>
-
-				<div class="bg-gray-50 p-3 text-center border-t border-gray-100">
-					<span class="text-xs text-pink-500 font-semibold cursor-pointer hover:underline">
-						Ver calendário completo
-					</span>
 				</div>
 
 			</div>

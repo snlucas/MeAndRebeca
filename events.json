@@ -13,8 +13,17 @@
         "month": "ABR",
         "year": "2026",
         "title": "Nossa Viagem para o Natal Luz",
-        "time": "1 semana",
+        "time": "1 Semana",
         "location": "Serra Gaúcha (Gramado)",
+        "type": "travel"
+    },
+    {
+        "day": "-",
+        "month": "---",
+        "year": "2026",
+        "title": "Picnic e Sessão de Fotos",
+        "time": "Dia todo",
+        "location": "Recanto das Sucupiras",
         "type": "travel"
     }
 ]
