@@ -1,7 +1,7 @@
 [
     {
         "type": "normal",
-        "text": "Oi, linda."
+        "text": "Oi, linda!"
     },
     {
         "type": "break"
@@ -12,7 +12,7 @@
     },
     {
         "type": "comment",
-        "text": "// Tudo foi se encaixando de forma natural e leve."
+        "text": "// Tudo foi se encaixando de forma leve e natural."
     },
     {
         "type": "break"
@@ -20,9 +20,6 @@
     {
         "type": "normal",
         "text": "Aos poucos fomos nos descobrindo e de forma gradual, a insegurança e desconfiança foram dando lugar à admiração e confiança."
-    },
-    {
-        "type": "break"
     },
     {
         "type": "comment",
@@ -34,9 +31,6 @@
     {
         "type": "normal",
         "text": "Vou me esforçar para te fazer feliz e te ajudar a sempre voar mais alto."
-    },
-    {
-        "type": "break"
     },
     {
         "type": "comment",
